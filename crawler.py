@@ -1,2 +1,2 @@
 def crawl(seed):
-    return
+    return None
