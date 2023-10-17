@@ -1,18 +1,46 @@
 import webdev
 
+title = ""
+urls = []
+words = []
 
 
 def crawl(seed):
-    x = webdev.read_url(seed)
+    global urls, words
+    
+    urls.clear()
+    
+    scrape_url(seed)
+    
+    print(title)
+    print(words)
+    print(urls)
+    
+    for i in urls:
+        scrape_url("http://people.scs.carleton.ca/~davidmckenney/tinyfruits" + i[1:])
+        
+        print(title)
+        print(words)
+        print(urls)
+    
+    
+    return None
+
+def scrape_url(url):
+    
+    global urls, words, title
+    
+    words.clear()
     title = ""
-    urls = []
-    words = []
+    
+    x = webdev.read_url(url)
+    
     
     i=0
     
-    print(x)
-    
+    #This is O(n) because the while loops in while loop are just continuing the parent loop.
     while i < (len(x)):
+        #If we encounter an opening tag
         if x[i] == "<":
             #Detect title
             if x[i+1] == "t":
@@ -41,35 +69,10 @@ def crawl(seed):
                         while x[i] != "\"" and x[i] != "\'":
                             link+=x[i]
                             i+=1
-                        urls.append(link)
+                        if link not in urls:
+                            urls.append(link)
                     i+=1
-        
         i+=1
-    
-    print(title)
-    print(words)
-    print(urls)
-    
-    
-                
-        
-    
-    return None
-
 p = crawl('http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html')
 
-# print(p)
-
-
-    # for i in webString:
-    #     index = i.find("href=")
-    #     lastindex = 0
-
-    #     if index != -1:
-    #         index+=6
-    #         for j in range(index+1, len(i)):
-    #             print(i[j])
-    #             if i[j] == "\"" or i[j] == "\'":
-    #                 urls.append(i[index:j])
-    #                 break
             
