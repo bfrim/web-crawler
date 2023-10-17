@@ -4,7 +4,9 @@ import webdev
 
 def crawl(seed):
     x = webdev.read_url(seed)
+    title = ""
     urls = []
+    words = []
     
     i=0
     
@@ -18,17 +20,14 @@ def crawl(seed):
                 title = ""
                 while not(x[i]=="<" and x[i+1]=="/"):
                     title += x[i]
-                    i+=1
-                print("Title:",title)
-                    
+                    i+=1   
             #Detect Paragraph
             elif x[i+1] == "p":
                 i+=3
                 word = ""
                 while not(x[i]=="<" and x[i+1]=="/"):
-                    
                     if word != "" and (x[i] == "" or x[i] == "\n"):
-                        # print(word)
+                        words.append(word.strip())
                         word = ""
                     else:
                         word += x[i]
@@ -38,7 +37,6 @@ def crawl(seed):
                 i+=3
                 link = ""
                 while not(x[i]=="<" and x[i+1]=="/"):
-                    print(x[i-6:i])
                     if x[i-6:i] == "href=\"":
                         while x[i] != "\"" and x[i] != "\'":
                             link+=x[i]
@@ -48,7 +46,11 @@ def crawl(seed):
         
         i+=1
     
+    print(title)
+    print(words)
     print(urls)
+    
+    
                 
         
     
