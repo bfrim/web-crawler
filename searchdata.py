@@ -1,20 +1,37 @@
 import webdev
+import osutil
+import crawler
 
+baseurl = ""
+urls = []
+initialized = False
+
+def init(seed):
+    global baseurl, initialized, urls
+    if not(initialized):
+        crawler.crawl(seed)
+        baseurl = osutil.read_file("data","baseurl.txt")[0]
+        urls = osutil.read_file("data", "links.txt")
+        initialized = True
+
+def get_tag(url):
+    init(url)
+    tag = ""
+    i = len(baseurl)
+    while url[i] != ".":
+        tag += url[i]
+        i+=1
+    return tag
+    
 # If the given URL was not found during the crawling process, this function must return the value None.
 def get_outgoing_links(URL):
-    links = []
-    page_content = webdev.read_url(URL)
-
-    link_start = page_content.find("<a href=")
-    while link_start != -1:
-        opening_quote = page_content.find('"', link_start)
-        ending_quote = page_content.find('"', opening_quote + 1)
-        url = page_content[opening_quote, 1:ending_quote]
-        links.append[url]
-
-        link_start = page_content.find("<a href=")
-    
-    return links
+    init(URL)
+    if URL in urls:
+        tag = get_tag(URL)
+        result = osutil.read_file("data",tag+"links.txt")
+        return result
+    else:
+        return None
 
 print(get_outgoing_links("http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html"))
 

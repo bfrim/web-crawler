@@ -20,6 +20,7 @@ def crawl(seed):
     baseurl = seed[:i+1]
     print("Base URL is",baseurl)
     
+    
     #First scrape
     print("Initiaiting first scrape from seed:", seed)
     scrape_url(seed)
@@ -31,14 +32,18 @@ def crawl(seed):
         osutil.delete_directory("data")
         osutil.create_directory("data")
         print("Deleted old directory and created new data directory")
-        
-    print()
+    
+    
+    osutil.create_file("data","baseurl.txt",[baseurl])
+    
     osutil.create_file("data","title.txt",[title])
     print("Title added to data directory", seed)
     osutil.create_file("data",title+".txt", words )
     print("Words added to data directory", seed)
     osutil.create_file("data",title+"links.txt", localurls)
     print("Links on page added to data directory", seed)
+    osutil.create_file("data","links.txt",[seed])
+    print("Link added to main directory")
     print()
     
     
@@ -53,6 +58,8 @@ def crawl(seed):
         print("Words added to data directory from", i)
         osutil.create_file("data",title+"links.txt", localurls)
         print("Links on page added to data directory from", i)
+        osutil.append_file("data","links.txt",i)
+        print("Link added to main directory")
         print()
     
     

@@ -55,13 +55,14 @@ def check_file(dir_name, file_name):
 			return True
 	return False
 
-def print_file(dir_name, file_name):
-	result = ""
+def read_file(dir_name, file_name):
+	result = []
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
 		if os.path.isfile(file_path):
 			filein = open(file_path, "r")
-			result = (filein.read())
+			for i in filein:
+				result.append(i.strip())
 			filein.close()
 	return result
 
