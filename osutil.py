@@ -18,7 +18,21 @@ def create_file(dir_name, file_name, contents):
 		file_path = os.path.join(dir_name, file_name)
 		if not os.path.exists(file_path):			
 			fileout = open(file_path, "w")
-			fileout.write(contents)
+			for i in contents:
+				fileout.write(str(i)+"\n")
+			fileout.close()
+			return True
+		else:
+			return False
+	else:
+		return False
+
+def append_file(dir_name, file_name, contents):
+	if os.path.isdir(dir_name):
+		file_path = os.path.join(dir_name, file_name)
+		if os.path.exists(file_path):			
+			fileout = open(file_path, "a")
+			fileout.write(str(contents) + "\n")
 			fileout.close()
 			return True
 		else:

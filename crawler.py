@@ -1,36 +1,69 @@
 import webdev
+import osutil
 
 title = ""
 urls = []
+localurls = []
 words = []
+baseurl = ""
 
 
 def crawl(seed):
-    global urls, words
+    global urls, words, localurls, baseurl
     
     urls.clear()
     
+    #find baseurl
+    i=len(seed)-1
+    while seed[i] != "/":
+        i -= 1
+    baseurl = seed[:i+1]
+    print("Base URL is",baseurl)
+    
+    #First scrape
+    print("Initiaiting first scrape from seed:", seed)
     scrape_url(seed)
     
-    print(title)
-    print(words)
-    print(urls)
-    
-    for i in urls:
-        scrape_url("http://people.scs.carleton.ca/~davidmckenney/tinyfruits" + i[1:])
+    if not(osutil.check_directory("data")):
+        osutil.create_directory("data")
+        print("Created new directory for data")
+    else:
+        osutil.delete_directory("data")
+        osutil.create_directory("data")
+        print("Deleted old directory and created new data directory")
         
-        print(title)
-        print(words)
-        print(urls)
+    print()
+    osutil.create_file("data","title.txt",[title])
+    print("Title added to data directory", seed)
+    osutil.create_file("data",title+".txt", words )
+    print("Words added to data directory", seed)
+    osutil.create_file("data",title+"links.txt", localurls)
+    print("Links on page added to data directory", seed)
+    print()
+    
+    
+    #All scrapes
+    print("Beginning scrape of all pages... \n")
+    for i in urls:
+        scrape_url(i)
+        
+        osutil.append_file("data","title.txt",title)
+        print("Title added to data directory from", i)
+        osutil.create_file("data",title+".txt", words )
+        print("Words added to data directory from", i)
+        osutil.create_file("data",title+"links.txt", localurls)
+        print("Links on page added to data directory from", i)
+        print()
     
     
     return None
 
 def scrape_url(url):
     
-    global urls, words, title
+    global localurls, urls, words, title
     
     words.clear()
+    localurls.clear()
     title = ""
     
     x = webdev.read_url(url)
@@ -69,10 +102,14 @@ def scrape_url(url):
                         while x[i] != "\"" and x[i] != "\'":
                             link+=x[i]
                             i+=1
+                        link = baseurl+link[2:]
                         if link not in urls:
                             urls.append(link)
+                        if link not in localurls:
+                            localurls.append(link)
                     i+=1
         i+=1
+        
 p = crawl('http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html')
 
             
