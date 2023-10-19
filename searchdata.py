@@ -18,6 +18,7 @@ def get_tag(url):
     init(url)
     tag = ""
     i = len(baseurl)
+    print(baseurl,url[i],url,i)
     while url[i] != ".":
         tag += url[i]
         i+=1
@@ -32,11 +33,28 @@ def get_outgoing_links(URL):
         return result
     else:
         return None
-
-print(get_outgoing_links("http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html"))
-
+    
 def get_incoming_links(URL):
-    pass
+    init(URL)
+    
+    result = []
+    
+    inputTags = osutil.read_file("data","links.txt")
+    
+    for i in inputTags:
+        print("Data",i)
+        if i == "":
+            break
+        tag = get_tag(i)
+        inputLinks = osutil.read_file("data",tag+"links.txt")
+        for j in inputLinks:
+            if j == URL:
+                result.append(i)
+    
+    return result
+    
+print(get_incoming_links("http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html"))
+       
 
 def get_page_rank(URL):
     pass
