@@ -24,7 +24,6 @@ def get_tag(url):
         i+=1
     return tag
     
-# If the given URL was not found during the crawling process, this function must return the value None.
 def get_outgoing_links(URL):
     init(URL)
     if URL in urls:
