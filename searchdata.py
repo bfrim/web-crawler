@@ -9,6 +9,7 @@ titles = []
 
 initialized = False
 
+#Helper functions
 def init(seed):
     global baseurl, initialized, urls, titles
     if not(initialized):
@@ -28,7 +29,9 @@ def get_tag(url):
         tag += url[i]
         i+=1
     return tag
-    
+
+#Important functions
+#Complete
 def get_outgoing_links(URL):
     init(URL)
     if URL in urls:
@@ -55,13 +58,12 @@ def get_incoming_links(URL):
                 continue
     
     return result
-    
-print(get_incoming_links("http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html"))
-       
 
+#In progress
 def get_page_rank(URL):
     pass
 
+#Barnabes Work
 def get_idf(word):
     pass
 
