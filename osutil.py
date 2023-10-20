@@ -2,11 +2,13 @@ import os
 
 
 def check_directory(dir_name):
+	'''Checks if a directory exist and returns a Boolean value. True if it does, False if not.'''
 	if os.path.isdir(dir_name):
 		return True
 	return False
 
 def create_directory(dir_name):
+	'''Creates a directory, returns True if it did, False if it did not'''
 	if os.path.exists(dir_name):
 		return False
 	else:
@@ -14,6 +16,7 @@ def create_directory(dir_name):
 		return True
 
 def create_file(dir_name, file_name, contents,):
+	'''Creates a file, accepts only a list as input in contents parameter, returns True if it worked, False if it did not'''
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
 		if not os.path.exists(file_path):			
@@ -28,6 +31,7 @@ def create_file(dir_name, file_name, contents,):
 		return False
 
 def append_file(dir_name, file_name, contents):
+	'''Appends to existing file, accepts only a string value as input in contents parameter, returns True if it worked, False if it did not'''    
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
 		if os.path.exists(file_path):			
@@ -41,6 +45,7 @@ def append_file(dir_name, file_name, contents):
 		return False
 
 def list_directory(dir_name):
+	'''Lists files in directory, returns a list of files in directory'''
 	result = []
 	if os.path.isdir(dir_name):
 		files = os.listdir(dir_name)
@@ -49,6 +54,7 @@ def list_directory(dir_name):
 	return result
 
 def check_file(dir_name, file_name):
+	'''Checks if file exists'''
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
 		if os.path.isfile(file_path):
@@ -56,6 +62,7 @@ def check_file(dir_name, file_name):
 	return False
 
 def read_file(dir_name, file_name):
+	'''Reads a file, returns a LIST of all lines in file'''
 	result = []
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
@@ -68,6 +75,7 @@ def read_file(dir_name, file_name):
 
 
 def delete_file(dir_name, file_name):
+	'''Deletes file'''
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
 		if os.path.isfile(file_path):
@@ -76,6 +84,7 @@ def delete_file(dir_name, file_name):
 	return False
 
 def delete_directory(dir_name):
+	'''Deletes directory and all it's files'''
 	if os.path.isdir(dir_name):
 		files = os.listdir(dir_name)
 		for file in files:
