@@ -1,17 +1,23 @@
 import webdev
 import osutil
 
+#srape_url
 title = ""
 urls = []
 localurls = []
 words = []
+
+#crawl
 baseurl = ""
+mainurl = ""
 
 
 def crawl(seed):
-    global urls, words, localurls, baseurl
+    global urls, words, localurls, baseurl, mainurl
     
     urls.clear()
+    
+    mainurl = seed
     
     #find baseurl
     i=len(seed)-1
@@ -34,16 +40,16 @@ def crawl(seed):
         print("Deleted old directory and created new data directory")
     
     
-    osutil.create_file("data","baseurl.txt",baseurl)
+    osutil.create_file("data","baseurl.txt",[baseurl])
     
-    osutil.create_file("data","title.txt",[title])
-    print("Title added to data directory", seed)
     osutil.create_file("data",title+".txt", words )
     print("Words added to data directory", seed)
     osutil.create_file("data",title+"links.txt", localurls)
     print("Links on page added to data directory", seed)
-    osutil.create_file("data","links.txt",seed)
-    print("Link added to main directory")
+    osutil.create_file("data","title.txt",[title])
+    print("Made titiles directory")
+    osutil.create_file("data","links.txt",[seed])
+    print("Made links directory")
     print()
     
     
@@ -110,13 +116,11 @@ def scrape_url(url):
                             link+=x[i]
                             i+=1
                         link = baseurl+link[2:]
-                        if link not in urls:
+                        if link not in urls and link != mainurl:
                             urls.append(link)
                         if link not in localurls:
                             localurls.append(link)
                     i+=1
         i+=1
-        
-# p = crawl('http://people.scs.carleton.ca/~davidmckenney/fruits/N-0.html')
 
             

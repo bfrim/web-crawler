@@ -3,15 +3,20 @@ import osutil
 import crawler
 
 baseurl = ""
+
 urls = []
+titles = []
+
 initialized = False
 
 def init(seed):
-    global baseurl, initialized, urls
+    global baseurl, initialized, urls, titles
     if not(initialized):
-        crawler.crawl(seed)
+        # crawler.crawl(seed)
         baseurl = osutil.read_file("data","baseurl.txt")[0]
         urls = osutil.read_file("data", "links.txt")
+        titles = osutil.read_file("data","title.txt")
+        
         initialized = True
 
 def get_tag(url):
@@ -35,20 +40,19 @@ def get_outgoing_links(URL):
     
 def get_incoming_links(URL):
     init(URL)
-    
+    print("HEllo")
     result = []
     
-    inputTags = osutil.read_file("data","links.txt")
-    
-    for i in inputTags:
-        print("Data",i)
-        if i == "":
-            break
-        tag = get_tag(i)
-        inputLinks = osutil.read_file("data",tag+"links.txt")
+    inputTags = titles
+    for i in range(len(inputTags)):
+        print(i)
+        inputLinks = osutil.read_file("data",inputTags[i]+"links.txt")
         for j in inputLinks:
+            print(j, URL)
             if j == URL:
-                result.append(i)
+                print("match")
+                result.append(urls[i])
+                continue
     
     return result
     

@@ -13,7 +13,7 @@ def create_directory(dir_name):
 		os.makedirs(dir_name)
 		return True
 
-def create_file(dir_name, file_name, contents):
+def create_file(dir_name, file_name, contents,):
 	if os.path.isdir(dir_name):
 		file_path = os.path.join(dir_name, file_name)
 		if not os.path.exists(file_path):			
@@ -65,6 +65,7 @@ def read_file(dir_name, file_name):
 				result.append(i.strip())
 			filein.close()
 	return result
+
 
 def delete_file(dir_name, file_name):
 	if os.path.isdir(dir_name):
