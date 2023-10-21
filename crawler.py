@@ -4,8 +4,11 @@ import osutil
 #srape_url
 title = ""
 urls = []
-localurls = []
+
 words = []
+
+outlinks = []
+tf = {}
 
 #crawl
 baseurl = ""
@@ -13,7 +16,7 @@ mainurl = ""
 
 
 def crawl(seed):
-    global urls, words, localurls, baseurl, mainurl
+    global urls, words, outlinks, baseurl, mainurl
     
     urls.clear()
     
@@ -33,18 +36,34 @@ def crawl(seed):
     
     if not(osutil.check_directory("data")):
         osutil.create_directory("data")
+        osutil.create_directory("data/words")
+        osutil.create_directory("data/incominglinks")
+        osutil.create_directory("data/outgoinglinks")
+        osutil.create_directory("data/tf")
+        osutil.create_directory("data/idf")
         print("Created new directory for data")
     else:
+        osutil.delete_directory("data/incominglinks")
+        osutil.delete_directory("data/outgoinglinks")
+        osutil.delete_directory("data/tf")
+        osutil.delete_directory("data/idf")
+        osutil.delete_directory("data/words")
         osutil.delete_directory("data")
+        
         osutil.create_directory("data")
+        osutil.create_directory("data/words")
+        osutil.create_directory("data/incominglinks")
+        osutil.create_directory("data/outgoinglinks")
+        osutil.create_directory("data/tf")
+        osutil.create_directory("data/idf")
         print("Deleted old directory and created new data directory")
     
     
     osutil.create_file("data","baseurl.txt",[baseurl])
     
-    osutil.create_file("data",title+".txt", words )
+    osutil.create_file("data/words",title+".txt", words )
     print("Words added to data directory", seed)
-    osutil.create_file("data",title+"links.txt", localurls)
+    osutil.create_file("data/incominglinks",title+".txt", outlinks)
     print("Links on page added to data directory", seed)
     osutil.create_file("data","title.txt",[title])
     print("Made titiles directory")
@@ -58,12 +77,20 @@ def crawl(seed):
     for i in urls:
         scrape_url(i)
         
+        #word data
+        osutil.create_file("data/words",title+".txt", words )
+        print("Words added to data directory from", i)
+        
+        #outgoing links
+        osutil.create_file("data/outgoinglinks",title+"links.txt", outlinks)
+        print("Links on page added to data directory from", i)
+        
+        #tf data
+        osutil.create_file_dict("data/tf",title+".txt",tf)
+        
+        
         osutil.append_file("data","title.txt",title)
         print("Title added to data directory from", i)
-        osutil.create_file("data",title+".txt", words )
-        print("Words added to data directory from", i)
-        osutil.create_file("data",title+"links.txt", localurls)
-        print("Links on page added to data directory from", i)
         osutil.append_file("data","links.txt",i)
         print("Link added to main directory")
         print()
@@ -73,11 +100,14 @@ def crawl(seed):
 
 def scrape_url(url):
     
-    global localurls, urls, words, title
+    global urls, words, title, outlinks, tf
     
-    words.clear()
-    localurls.clear()
     title = ""
+    words.clear()
+    
+    outlinks.clear()
+    tf.clear()
+    
     
     x = webdev.read_url(url)
     
@@ -106,6 +136,17 @@ def scrape_url(url):
                     else:
                         word += x[i]
                     i+=1
+                #Time to calculate some idf and tf :)
+                for j in words:
+                    if j not in tf:
+                        tf[j] = 1
+                    elif j in tf:
+                        tf[j] += 1
+                for j in tf:
+                    tf[j] /= len(words)
+                    
+                    
+                
             #Detect Anchor
             elif x[i+1] == "a":
                 i+=3
@@ -118,9 +159,10 @@ def scrape_url(url):
                         link = baseurl+link[2:]
                         if link not in urls and link != mainurl:
                             urls.append(link)
-                        if link not in localurls:
-                            localurls.append(link)
+                        if link not in outlinks:
+                            outlinks.append(link)
                     i+=1
         i+=1
-
+        
+p = crawl("http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html")
             
