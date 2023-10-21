@@ -8,7 +8,9 @@ urls = []
 words = []
 
 outlinks = []
+
 tf = {}
+idf = {}
 
 #crawl
 baseurl = ""
@@ -31,7 +33,6 @@ def crawl(seed):
     
     
     #First scrape
-    print("Initiaiting first scrape from seed:", seed)
     scrape_url(seed)
     
     if not(osutil.check_directory("data")):
@@ -41,7 +42,6 @@ def crawl(seed):
         osutil.create_directory("data/outgoinglinks")
         osutil.create_directory("data/tf")
         osutil.create_directory("data/idf")
-        print("Created new directory for data")
     else:
         osutil.delete_directory("data/incominglinks")
         osutil.delete_directory("data/outgoinglinks")
@@ -55,52 +55,42 @@ def crawl(seed):
         osutil.create_directory("data/incominglinks")
         osutil.create_directory("data/outgoinglinks")
         osutil.create_directory("data/tf")
-        osutil.create_directory("data/idf")
-        print("Deleted old directory and created new data directory")
-    
+        osutil.create_directory("data/idf")    
     
     osutil.create_file("data","baseurl.txt",[baseurl])
+    osutil.create_file("data","title.txt",[title])
+    osutil.create_file("data","links.txt",[seed])
+    
     
     osutil.create_file("data/words",title+".txt", words )
-    print("Words added to data directory", seed)
-    osutil.create_file("data/incominglinks",title+".txt", outlinks)
-    print("Links on page added to data directory", seed)
-    osutil.create_file("data","title.txt",[title])
-    print("Made titiles directory")
-    osutil.create_file("data","links.txt",[seed])
-    print("Made links directory")
-    print()
+    osutil.create_file("data/outgoinglinks",title+".txt", outlinks)
     
     
+
     #All scrapes
     print("Beginning scrape of all pages... \n")
     for i in urls:
         scrape_url(i)
         
         #word data
-        osutil.create_file("data/words",title+".txt", words )
-        print("Words added to data directory from", i)
+        osutil.create_file("data/words",title+".txt", words ) 
         
         #outgoing links
         osutil.create_file("data/outgoinglinks",title+"links.txt", outlinks)
-        print("Links on page added to data directory from", i)
         
         #tf data
         osutil.create_file_dict("data/tf",title+".txt",tf)
         
-        
         osutil.append_file("data","title.txt",title)
-        print("Title added to data directory from", i)
         osutil.append_file("data","links.txt",i)
-        print("Link added to main directory")
-        print()
     
+    osutil.create_file_dict_list("data/idf",".txt",idf)
     
     return None
 
 def scrape_url(url):
     
-    global urls, words, title, outlinks, tf
+    global urls, words, title, outlinks, tf, idf
     
     title = ""
     words.clear()
@@ -138,10 +128,17 @@ def scrape_url(url):
                     i+=1
                 #Time to calculate some idf and tf :)
                 for j in words:
+                    #tf conditionals
                     if j not in tf:
                         tf[j] = 1
                     elif j in tf:
                         tf[j] += 1
+                    #idf conditionals
+                    if j not in idf:
+                        idf[j] = [url]
+                    elif j in idf:
+                        if url not in idf[j]:
+                            idf[j].append(url)
                 for j in tf:
                     tf[j] /= len(words)
                     

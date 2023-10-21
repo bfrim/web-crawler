@@ -42,6 +42,19 @@ def create_file_dict(dir_name, file_name, contents,):
 	else:
 		return False
 
+def create_file_dict_list(dir_name, file_name, contents,):
+	'''Creates a file, accepts only a list as input in contents parameter, returns True if it worked, False if it did not'''
+	if os.path.isdir(dir_name):
+		for i in contents:
+			file_path = os.path.join(dir_name, i+file_name)
+			if not os.path.exists(file_path):			
+				fileout = open(file_path, "w")
+				for j in contents[i]:
+					fileout.write(str(j)+"\n")
+				fileout.close()
+	else:
+		return False
+
 def append_file(dir_name, file_name, contents):
 	'''Appends to existing file, accepts only a string value as input in contents parameter, returns True if it worked, False if it did not'''    
 	if os.path.isdir(dir_name):
