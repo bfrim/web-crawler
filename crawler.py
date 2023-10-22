@@ -120,7 +120,6 @@ def crawl(seed):
         inlink = osutil.read_file("data/outgoinglinks",linktitle+".txt")
         
         for j in inlink:
-            print(linkMap)
             intitle = linkMap[j]
             if osutil.check_file("data/incominglinks",intitle+".txt"):
                 osutil.append_file("data/incominglinks",intitle+".txt",link)
