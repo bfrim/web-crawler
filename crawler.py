@@ -22,7 +22,6 @@ mainurl = ""
 def get_tag(url):
     tag = ""
     i = len(baseurl)
-    print(baseurl,url[i],url,i)
     while url[i] != ".":
         tag += url[i]
         i+=1
@@ -110,6 +109,10 @@ def crawl(seed):
     links = osutil.read_file("data","links.txt")
     titles = osutil.read_file("data","title.txt")
     
+    linkMap = {}
+    for i in range(len(links)):
+        linkMap[links[i]]=titles[i]
+        
     for i in range(len(links)):
         link = links[i]
         linktitle = titles[i]
@@ -117,7 +120,8 @@ def crawl(seed):
         inlink = osutil.read_file("data/outgoinglinks",linktitle+".txt")
         
         for j in inlink:
-            intitle = get_tag(j)
+            print(linkMap)
+            intitle = linkMap[j]
             if osutil.check_file("data/incominglinks",intitle+".txt"):
                 osutil.append_file("data/incominglinks",intitle+".txt",link)
             else:
@@ -147,8 +151,10 @@ def scrape_url(url):
         #If we encounter an opening tag
         if x[i] == "<":
             #Detect title
-            if x[i+1] == "t":
-                i+=7
+            if x[i+1:i+6] == "title":
+                while x[i] != ">":
+                    i+=1
+                i+=1
                 title = ""
                 while not(x[i]=="<" and x[i+1]=="/"):
                     title += x[i]

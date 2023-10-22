@@ -7,46 +7,53 @@ baseurl = ""
 
 urls = []
 titles = []
+urlMap = {}
 
 initialized = False
 
 #Helper functions
 def init(seed):
-    global baseurl, initialized, urls, titles
+    global baseurl, initialized, urls, titles, urlMap
     if not(initialized):
         # crawler.crawl(seed)
         baseurl = osutil.read_file("data","baseurl.txt")[0]
         urls = osutil.read_file("data", "links.txt")
         titles = osutil.read_file("data","title.txt")
         
+        urlMap = {}
+        for i in range(len(urls)):
+            urlMap[urls[i]]=titles[i]
+            
         initialized = True
 
-def get_tag(url):
-    init(url)
-    tag = ""
-    i = len(baseurl)
-    while url[i] != ".":
-        tag += url[i]
-        i+=1
-    return tag
+def get_tag(URL):
+    init(URL)
+    if URL in urlMap:
+        return urlMap[URL]
+    else: return ''
 
 #Important functions
 #Complete
 def get_outgoing_links(URL):
     init(URL)
-    if URL in urls:
-        tag = get_tag(URL)
-        result = osutil.read_file("data/outgoinglinks",tag+".txt")
-        return result
-    else:
+    tag = get_tag(URL)
+    result = osutil.read_file("data/outgoinglinks",tag+".txt")
+    
+    if result == False:
         return None
+    else:
+        return result
     
 def get_incoming_links(URL):
     init(URL)
     result = []
     tag = get_tag(URL)
     result = osutil.read_file("data/incominglinks",tag+".txt")
-    return result
+    
+    if result == False:
+        return None
+    else:
+        return result
 
 def get_idf(word):
     result = osutil.read_file("data/idf",word+".txt")
@@ -55,7 +62,6 @@ def get_idf(word):
     else:
         return float(result[0])
     
-
 def get_tf(URL, word):
     init(URL)
     result = []
