@@ -18,21 +18,18 @@ def search(phrase, boost):
             words[i] +=1
         else:
             words[i] = 1
-    for i in range(len(phrase)):
-        qvector.append(math.log(1+(words[phrase[i]]/len(phrase)))*searchdata.get_idf(phrase[i]))
+        
+    for i in words:
+        qvector.append(math.log(1+words[i]/len(phrase))*searchdata.get_idf(i))
     
     #Make a Vector Space Model for Documents
     for i in urls:
         vectors.append([])
     
-    for i in range(len(phrase)):
+    for i in words:
         for j in range(len(urls)):
-            vectors[j].append(searchdata.get_tf_idf(urls[j],phrase[i]))
+            vectors[j].append(searchdata.get_tf_idf(urls[j],i))
     
-    for i in vectors:
-        print(i)
-    
-    print("\n",qvector)
     
     numerator = 0
     leftdenom = 0
@@ -51,16 +48,20 @@ def search(phrase, boost):
             cosine.append(0)
         else: cosine.append((numerator)/((leftdenom**0.5)*(rightdenom**0.5)))
     
-    for i in range(len(cosine)):
-        print(cosine[i],urls[i])
-            
-    
-    
     if boost:
-        for i in top:
-            i["score"] *= searchdata.get_page_rank(i["url"])
-        return top
-    else:
-        return top
+        for i in range(len(cosine)):
+            cosine[i] *= searchdata.get_page_rank(urls[i])
     
-search("papaya banana", False)
+    already_picked = []
+    
+    for i in range(10):
+        high = -1
+        high_index = -1
+        for j in range(len(cosine)):
+            if (cosine[j] > high) and (j not in already_picked):
+                high = cosine[j]   
+                high_index = j
+        top.append({"url":urls[high_index],"title":titles[high_index],"score":cosine[high_index]})
+        already_picked.append(high_index)
+
+    return top
