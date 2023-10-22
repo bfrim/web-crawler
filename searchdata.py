@@ -1,6 +1,7 @@
 import webdev
 import osutil
 import crawler
+import math
 
 baseurl = ""
 
@@ -24,7 +25,6 @@ def get_tag(url):
     init(url)
     tag = ""
     i = len(baseurl)
-    print(baseurl,url[i],url,i)
     while url[i] != ".":
         tag += url[i]
         i+=1
@@ -36,39 +36,42 @@ def get_outgoing_links(URL):
     init(URL)
     if URL in urls:
         tag = get_tag(URL)
-        result = osutil.read_file("data",tag+"links.txt")
+        result = osutil.read_file("data/outgoinglinks",tag+".txt")
         return result
     else:
         return None
     
 def get_incoming_links(URL):
     init(URL)
-    print("HEllo")
     result = []
-    
-    inputTags = titles
-    for i in range(len(inputTags)):
-        print(i)
-        inputLinks = osutil.read_file("data",inputTags[i]+"links.txt")
-        for j in inputLinks:
-            print(j, URL)
-            if j == URL:
-                print("match")
-                result.append(urls[i])
-                continue
-    
+    tag = get_tag(URL)
+    result = osutil.read_file("data/incominglinks",tag+".txt")
     return result
 
+def get_idf(word):
+    result = osutil.read_file("data/idf",word+".txt")
+    if result == False:
+        return 0
+    else:
+        return float(result[0])
+    
+
+def get_tf(URL, word):
+    init(URL)
+    result = []
+    tag = get_tag(URL)
+    result = osutil.read_file("data/tf",word+tag+".txt")
+    if result == False:
+        return 0
+    else:
+        return float(result[0])
+
+def get_tf_idf(URL, word):
+    return math.log(1+get_tf(URL,word),2)*get_idf(word)
+   
+#Barnabes Work
 #In progress
 def get_page_rank(URL):
     pass
 
-#Barnabes Work
-def get_idf(word):
-    pass
 
-def get_tf(URL, word):
-    pass
-
-def get_tf_idf(URL, word):
-    pass

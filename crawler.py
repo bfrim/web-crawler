@@ -1,5 +1,6 @@
 import webdev
 import osutil
+import math
 
 #srape_url
 title = ""
@@ -9,18 +10,30 @@ words = []
 
 outlinks = []
 
+inlinks = {}
+
 tf = {}
 idf = {}
+
 
 #crawl
 baseurl = ""
 mainurl = ""
-
+def get_tag(url):
+    tag = ""
+    i = len(baseurl)
+    print(baseurl,url[i],url,i)
+    while url[i] != ".":
+        tag += url[i]
+        i+=1
+    return tag
 
 def crawl(seed):
-    global urls, words, outlinks, baseurl, mainurl
+    global urls, words, outlinks, baseurl, mainurl, idf, inlinks
     
     urls.clear()
+    idf.clear()
+    inlinks.clear()
     
     mainurl = seed
     
@@ -63,7 +76,10 @@ def crawl(seed):
     
     
     osutil.create_file("data/words",title+".txt", words )
+    
     osutil.create_file("data/outgoinglinks",title+".txt", outlinks)
+    
+    osutil.create_file_dict("data/tf",title+".txt",tf)
     
     
 
@@ -74,23 +90,45 @@ def crawl(seed):
         
         #word data
         osutil.create_file("data/words",title+".txt", words ) 
-        
         #outgoing links
-        osutil.create_file("data/outgoinglinks",title+"links.txt", outlinks)
-        
+        osutil.create_file("data/outgoinglinks",title+".txt", outlinks)
         #tf data
         osutil.create_file_dict("data/tf",title+".txt",tf)
         
+        #data
         osutil.append_file("data","title.txt",title)
         osutil.append_file("data","links.txt",i)
     
-    osutil.create_file_dict_list("data/idf",".txt",idf)
+    #idf data
+    documentnumber = len(osutil.read_file("data","links.txt"))
+    for i in idf:
+        idf[i]=math.log(documentnumber/(1+len(idf[i])),2)
+        
+    osutil.create_file_dict("data/idf",".txt",idf)
+    
+    #incoming links
+    links = osutil.read_file("data","links.txt")
+    titles = osutil.read_file("data","title.txt")
+    
+    for i in range(len(links)):
+        link = links[i]
+        linktitle = titles[i]
+        
+        inlink = osutil.read_file("data/outgoinglinks",linktitle+".txt")
+        
+        for j in inlink:
+            intitle = get_tag(j)
+            if osutil.check_file("data/incominglinks",intitle+".txt"):
+                osutil.append_file("data/incominglinks",intitle+".txt",link)
+            else:
+                osutil.create_file("data/incominglinks",intitle+".txt",[link])
+    
     
     return None
 
 def scrape_url(url):
     
-    global urls, words, title, outlinks, tf, idf
+    global urls, words, title, outlinks, inlinks, tf, idf
     
     title = ""
     words.clear()
@@ -141,9 +179,7 @@ def scrape_url(url):
                             idf[j].append(url)
                 for j in tf:
                     tf[j] /= len(words)
-                    
-                    
-                
+                           
             #Detect Anchor
             elif x[i+1] == "a":
                 i+=3
@@ -154,10 +190,12 @@ def scrape_url(url):
                             link+=x[i]
                             i+=1
                         link = baseurl+link[2:]
+                        #Links conditional
                         if link not in urls and link != mainurl:
                             urls.append(link)
                         if link not in outlinks:
                             outlinks.append(link)
+                        
                     i+=1
         i+=1
         

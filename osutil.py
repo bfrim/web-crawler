@@ -96,6 +96,8 @@ def read_file(dir_name, file_name):
 			for i in filein:
 				result.append(i.strip())
 			filein.close()
+		else:
+			return False
 	return result
 
 
