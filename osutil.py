@@ -69,23 +69,6 @@ def append_file(dir_name, file_name, contents):
 	else:
 		return False
 
-def list_directory(dir_name):
-	'''Lists files in directory, returns a list of files in directory'''
-	result = []
-	if os.path.isdir(dir_name):
-		files = os.listdir(dir_name)
-		for file in files:
-			result.append(file)
-	return result
-
-def check_file(dir_name, file_name):
-	'''Checks if file exists'''
-	if os.path.isdir(dir_name):
-		file_path = os.path.join(dir_name, file_name)
-		if os.path.isfile(file_path):
-			return True
-	return False
-
 def read_file(dir_name, file_name):
 	'''Reads a file, returns a LIST of all lines in file'''
 	result = []
@@ -99,16 +82,6 @@ def read_file(dir_name, file_name):
 		else:
 			return False
 	return result
-
-
-def delete_file(dir_name, file_name):
-	'''Deletes file'''
-	if os.path.isdir(dir_name):
-		file_path = os.path.join(dir_name, file_name)
-		if os.path.isfile(file_path):
-			os.remove(file_path)
-			return True
-	return False
 
 def delete_directory(dir_name):
 	'''Deletes directory and all it's files'''

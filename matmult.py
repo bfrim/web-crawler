@@ -1,18 +1,3 @@
-
-#Multiplies an entire matrix by a scalar value
-def mult_scalar(matrix, scale):
-    result = []
-    #Acess every row
-    for i in range(len(matrix)):
-        row = []
-        #Acess elements in row and multiply it to scalar value and append to row
-        for j in range(len(matrix[i])):
-            row.append(matrix[i][j] * scale)
-        #Append row to result matrix
-        result.append(row)
-    
-    return result
-    
 #Multiplies Matrix by another matrix
 #Note: A matrix with one row should be defined as [[1,2,3]] not [1,2,3]
 #Note 2: Matrix multiplication only works if a-columns = b-columns; there is no error-checking

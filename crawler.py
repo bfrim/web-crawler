@@ -1,6 +1,7 @@
 import webdev
 import osutil
 import math
+import matmult
 
 #srape_url
 title = ""
@@ -19,13 +20,6 @@ idf = {}
 #crawl
 baseurl = ""
 mainurl = ""
-def get_tag(url):
-    tag = ""
-    i = len(baseurl)
-    while url[i] != ".":
-        tag += url[i]
-        i+=1
-    return tag
 
 def crawl(seed):
     global urls, words, outlinks, baseurl, mainurl, idf, inlinks
@@ -52,6 +46,7 @@ def crawl(seed):
         osutil.create_directory("data/words")
         osutil.create_directory("data/incominglinks")
         osutil.create_directory("data/outgoinglinks")
+        osutil.create_directory("data/pagerank")   
         osutil.create_directory("data/tf")
         osutil.create_directory("data/idf")
     else:
@@ -59,6 +54,7 @@ def crawl(seed):
         osutil.delete_directory("data/outgoinglinks")
         osutil.delete_directory("data/tf")
         osutil.delete_directory("data/idf")
+        osutil.delete_directory("data/pagerank")   
         osutil.delete_directory("data/words")
         osutil.delete_directory("data")
         
@@ -66,6 +62,7 @@ def crawl(seed):
         osutil.create_directory("data/words")
         osutil.create_directory("data/incominglinks")
         osutil.create_directory("data/outgoinglinks")
+        osutil.create_directory("data/pagerank")   
         osutil.create_directory("data/tf")
         osutil.create_directory("data/idf")    
     
@@ -85,6 +82,7 @@ def crawl(seed):
     #All scrapes
     print("Beginning scrape of all pages... \n")
     for i in urls:
+        print('Scraping page', i)
         scrape_url(i)
         
         #word data
@@ -126,7 +124,42 @@ def crawl(seed):
             else:
                 osutil.create_file("data/incominglinks",intitle+".txt",[link])
     
+    #pagerank
+    print("Getting page ranks")
+    map = links
+    matrix = []
+    alpha = 0.1
+
+    for i in range(len(map)):
+        x = osutil.read_file("data/incominglinks",titles[i]+".txt")
+        matrix.append([])
+        for j in range(len(map)):
+            if map[j] in x:
+                matrix[i].append(1)
+                matrix[i][j] /= len(x)
+                matrix[i][j] = (1-alpha)*matrix[i][j]
+                matrix[i][j] += alpha/len(map)
+            else:
+                matrix[i].append(0)
+                matrix[i][j] += alpha/len(map)
+
+    print("Matrix Complete")
+
+    t = [[]]
+    for i in range(len(map)):
+        t[0].append(1/len(map))
     
+    distance = 1
+    
+    print("Beginning Distance Calculations")
+    while distance > 0.0001:
+        old_t = t
+        t = matmult.mult_matrix(t,matrix)
+        
+        distance = matmult.euclidean_dist(t,old_t)
+
+    for i in range(len(titles)):
+        osutil.create_file("data/pagerank",titles[i]+".txt", [t[0][i]])
     return None
 
 def scrape_url(url):
@@ -203,6 +236,3 @@ def scrape_url(url):
                         
                     i+=1
         i+=1
-        
-p = crawl("http://people.scs.carleton.ca/~davidmckenney/tinyfruits/N-0.html")
-            
