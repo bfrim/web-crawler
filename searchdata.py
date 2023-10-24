@@ -1,18 +1,15 @@
-import webdev
 import osutil
-import crawler
 import math
-import matmult
 
+#Global variables used to reduce runtime complexity
 baseurl = ""
-
 urls = []
 titles = []
 urlMap = {}
-
 initialized = False
 
-#Helper functions
+#This init function will find the baseurl, and add all urls, and titles to lists. It will also make a hashmap to reduce runtime complexity when finding a filename for a url.
+#O(n) 
 def init(seed):
     global baseurl, initialized, urls, titles, urlMap
     if not(initialized):
@@ -27,12 +24,16 @@ def init(seed):
         initialized = True
         print("Initialized")
 
+#Returns the correct filename for a url, blank if not found.
+#O(1) if init() has been run, O(n) otherwise
 def get_tag(URL):
     init(URL)
     if URL in urlMap:
         return urlMap[URL]
     else: return ''
 
+#Returns the outgoing links from the directory data/outgoinglinks.
+#O(n) 
 def get_outgoing_links(URL):
     init(URL)
     tag = get_tag(URL)
@@ -42,7 +43,9 @@ def get_outgoing_links(URL):
         return None
     else:
         return result
-    
+
+#Returns the incoming links from the directory data/incominglinks.
+#O(n) 
 def get_incoming_links(URL):
     init(URL)
     result = []
@@ -54,13 +57,17 @@ def get_incoming_links(URL):
     else:
         return result
 
+#Returns the idf value from the directory data/idf.
+#O(1) if init() has been run, O(n) otherwise
 def get_idf(word):
     result = osutil.read_file("data/idf",word+".txt")
     if result == False:
         return 0
     else:
         return float(result[0])
-    
+
+#Returns the tf value from the directory data/tf.
+#O(1) if init() has been run, O(n) otherwise
 def get_tf(URL, word):
     init(URL)
     result = []
@@ -71,9 +78,13 @@ def get_tf(URL, word):
     else:
         return float(result[0])
 
+#Returns the value tf_idf using the previous two functions
+#O(1) if init() has been run, O(n) otherwise
 def get_tf_idf(URL, word):
     return math.log(1+get_tf(URL,word),2)*get_idf(word)
 
+#Returns the pagerank value from the directory, data/pagerank
+#O(1) if init() has been run, O(n) otherwise
 def get_page_rank(URL):
     init(URL)
     tag = get_tag(URL)
