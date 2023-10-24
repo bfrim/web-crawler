@@ -83,6 +83,16 @@ def read_file(dir_name, file_name):
 			return False
 	return result
 
+def check_file(dir_name, file_name):
+	if os.path.isdir(dir_name):
+		file_path = os.path.join(dir_name, file_name)
+		if os.path.isfile(file_path):
+			return True
+		else:
+			return False
+	else:
+		return False
+
 def delete_directory(dir_name):
 	'''Deletes directory and all it's files'''
 	if os.path.isdir(dir_name):

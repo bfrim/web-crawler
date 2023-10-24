@@ -65,3 +65,8 @@ def search(phrase, boost):
         already_picked.append(high_index)
 
     return top
+
+p = search("apple",True)
+
+for i in p:
+    print(i)
