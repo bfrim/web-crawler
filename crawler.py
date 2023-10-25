@@ -63,6 +63,7 @@ def scrape_url(url):
                         word += webString[i]
                     i+=1
                 #Counting words for tf and adding a url to a word if it appears in it
+                #O(n^2)
                 for j in words:
                     #tf conditionals
                     if j not in tf:
@@ -73,6 +74,7 @@ def scrape_url(url):
                     if j not in idf:
                         idf[j] = [url]
                     elif j in idf:
+                        #O(n^3)
                         if url not in idf[j]:
                             idf[j].append(url)
                 #Actually calculate tf
@@ -172,12 +174,6 @@ def crawl(seed):
         osutil.append_file("data","title.txt",title)
         osutil.append_file("data","links.txt",i)
     
-    #Calculating IDF and putting it in a file for each word in the dictioniary idf.
-    documentnumber = len(osutil.read_file("data","links.txt"))
-    for i in idf:
-        idf[i]=math.log(documentnumber/(1+len(idf[i])),2)
-        
-    osutil.create_file_dict("data/idf",".txt",idf)
     
     #Finding incoming links
     links = osutil.read_file("data","links.txt")
@@ -187,7 +183,13 @@ def crawl(seed):
     linkMap = {}
     for i in range(len(links)):
         linkMap[links[i]]=titles[i]
+        
+    calculate_incoming(links, titles, linkMap)
+    calculate_idf()
+    calculate_pagerank(links,titles)
     
+    
+def calculate_incoming(links, titles, linkMap):
     #Loop through each url
     for i in range(len(links)):
         #Find the current url and it's file_name/title
@@ -205,10 +207,18 @@ def crawl(seed):
             if osutil.check_file("data/incominglinks",intitle+".txt"):
                 osutil.append_file("data/incominglinks",intitle+".txt",link)
             else:
-                osutil.create_file("data/incominglinks",intitle+".txt",[link])
+                osutil.create_file("data/incominglinks",intitle+".txt",[link])   
     
-    #Calculating Pageranks
-    #Make constants and important variables
+def calculate_idf():
+    global idf
+    documentnumber = len(osutil.read_file("data","links.txt"))
+    for i in idf:
+        idf[i]=math.log(documentnumber/(1+len(idf[i])),2)
+    osutil.create_file_dict("data/idf",".txt",idf)
+
+#Calculating Pageranks
+#Make constants and important variables       
+def calculate_pagerank(links, titles):
     map = links
     matrix = []
     alpha = 0.1
@@ -244,4 +254,3 @@ def crawl(seed):
     #Add each pagerank value to its related file/webpage
     for i in range(len(titles)):
         osutil.create_file("data/pagerank",titles[i]+".txt", [t[0][i]])
-        
