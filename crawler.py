@@ -124,6 +124,7 @@ def crawl(seed):
     baseurl = seed[:i+1]    
     
     #First scrape in the seed
+    index = 0
     scrape_url(seed)
     
     #Makes directories and deletes old ones if they exist
@@ -153,61 +154,63 @@ def crawl(seed):
         osutil.create_directory("data/idf")    
     #Make 'Global' files that will be used later
     osutil.create_file("data","baseurl.txt",[baseurl])
+    osutil.create_file("data","index.txt",[index])
     osutil.create_file("data","title.txt",[title])
     osutil.create_file("data","links.txt",[seed])
     
     #Adding outgoinglinks and tf data
-    osutil.create_file("data/words",title+".txt", words )
-    osutil.create_file("data/outgoinglinks",title+".txt", outlinks)
-    osutil.create_file_dict("data/tf",title+".txt",tf)
+    osutil.create_file("data/outgoinglinks",str(index)+".txt", outlinks)
+    osutil.create_file_dict("data/tf",str(index)+".txt",tf)
     
+    index+=1
     #Begins scrape of all urls, adds urls not found in lists in scrape_url and continues to iterates through added urls 
     for i in urls:
         scrape_url(i)
         
         #Adding outgoinglinks and tf data
-        osutil.create_file("data/words",title+".txt", words ) 
-        osutil.create_file("data/outgoinglinks",title+".txt", outlinks)
-        osutil.create_file_dict("data/tf",title+".txt",tf)
+        osutil.create_file("data/outgoinglinks",str(index)+".txt", outlinks)
+        osutil.create_file_dict("data/tf",str(index)+".txt",tf)
         
         #Adding to 'global' data
+        osutil.append_file("data","index.txt",str(index))
         osutil.append_file("data","title.txt",title)
         osutil.append_file("data","links.txt",i)
+        index += 1
     
     
     #Finding incoming links
     links = osutil.read_file("data","links.txt")
-    titles = osutil.read_file("data","title.txt")
+    indexes = osutil.read_file("data","index.txt")
     
     #Make a hashmap to access the title/file name for each url in constant time.
     linkMap = {}
     for i in range(len(links)):
-        linkMap[links[i]]=titles[i]
+        linkMap[links[i]]=indexes[i]
         
-    calculate_incoming(links, titles, linkMap)
+    calculate_incoming(links, indexes, linkMap)
     calculate_idf()
-    calculate_pagerank(links,titles)
+    calculate_pagerank(links,indexes)
     
     
-def calculate_incoming(links, titles, linkMap):
+def calculate_incoming(links, indexes, linkMap):
     #Loop through each url
     for i in range(len(links)):
         #Find the current url and it's file_name/title
         link = links[i]
-        linktitle = titles[i]
+        index = indexes[i]
         
         #Read the links it goes too
-        inlink = osutil.read_file("data/outgoinglinks",linktitle+".txt")
+        inlink = osutil.read_file("data/outgoinglinks",index+".txt")
         
         #Look through each link it points too
         for j in inlink:
             #Find it's title
-            intitle = linkMap[j]
+            index_in = linkMap[j]
             #If the file already exists, add the link we are reading from to the file of the link it pointed to. If it does not make a new one
-            if osutil.check_file("data/incominglinks",intitle+".txt"):
-                osutil.append_file("data/incominglinks",intitle+".txt",link)
+            if osutil.check_file("data/incominglinks",index_in+".txt"):
+                osutil.append_file("data/incominglinks",index_in+".txt",link)
             else:
-                osutil.create_file("data/incominglinks",intitle+".txt",[link])   
+                osutil.create_file("data/incominglinks",index_in+".txt",[link])   
     
 def calculate_idf():
     global idf
@@ -218,14 +221,14 @@ def calculate_idf():
 
 #Calculating Pageranks
 #Make constants and important variables       
-def calculate_pagerank(links, titles):
+def calculate_pagerank(links, indexes):
     map = links
     matrix = []
     alpha = 0.1
 
     #This for loop maps each link to a matrix and applies all calculations to calculate adjacency to scale.
     for i in range(len(map)):
-        x = osutil.read_file("data/incominglinks",titles[i]+".txt")
+        x = osutil.read_file("data/incominglinks",indexes[i]+".txt")
         matrix.append([])
         for j in range(len(map)):
             if map[j] in x:
@@ -252,5 +255,5 @@ def calculate_pagerank(links, titles):
         distance = matmult.euclidean_dist(t,old_t)
     
     #Add each pagerank value to its related file/webpage
-    for i in range(len(titles)):
-        osutil.create_file("data/pagerank",titles[i]+".txt", [t[0][i]])
+    for i in range(len(indexes)):
+        osutil.create_file("data/pagerank",indexes[i]+".txt", [t[0][i]])

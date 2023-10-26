@@ -4,6 +4,7 @@ import math
 
 def search(phrase, boost):
     urls = osutil.read_file('data',"links.txt")
+    indexes = osutil.read_file('data',"indexes.txt")
     titles = osutil.read_file('data',"title.txt")
     
     top = []
